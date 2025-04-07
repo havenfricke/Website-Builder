@@ -7,17 +7,17 @@ class PageService
     // READ
     async getAllPages()
     {
-        AppState.pageArray = []
+        AppState.pages = []
         const response = await api.get('/pages');
-        console.log('get pages', response.data);
-        AppState.pageArray = response.data.data.map(page => new Page(page));
+        console.log('[GET PAGE]', response.data);
+        AppState.pages = response.data.data.map(page => new Page(page));
     }
 
     // READ BY ID
     async getPageByID(id)
     {
         const response = await api.get(`/pages/${id}`);
-        console.log('get exmaple by id', response.data);
+        console.log('[GET PAGE BY ID]', response.data);
         AppState.activePage = response.data;
     }
 }

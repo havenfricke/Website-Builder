@@ -15,8 +15,9 @@ const slugify = (text) => {
     .replace(/-+$/, '');      // Trim - from end of text
 };
 
+
 export const Navbar = observer(() => {
-  const pages = AppState.pageArray;
+  const pages = AppState.pages;
 
   return (
     <nav id="nav">

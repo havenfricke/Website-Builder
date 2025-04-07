@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { pageService } from "../Services/PageService";
+import { pageImageService } from "../Services/PageImageService";
 import { AppState } from "../AppState";
 
 function HomePage() {
@@ -9,9 +10,15 @@ function HomePage() {
   }, []);
 
   // Find the page titled "Home" (case insensitive)
-  const homePage = AppState.pageArray.find(
+  const homePage = AppState.pages.find(
     page => page.title.toLowerCase() === "home"
   );
+
+  if(homePage)
+  {
+    pageImageService.getAllPageImages(homePage.id);
+  }
+  
 
   return (
     <section className="home-page">

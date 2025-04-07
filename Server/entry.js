@@ -5,8 +5,8 @@ const port = process.env.LISTENING_PORT;
 const serverOrigin = process.env.SERVER_ORIGIN;
 
 // EXPRESS MIDDLEWARE: Body parsers should come first!
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded( { limit: '50mb', extended: true } ));
 
 // Static files middleware (if needed)
 app.use(express.static('Public')); 
@@ -60,8 +60,16 @@ app.use((req, res, next) => {
 
 // Register your controllers after the body parsing middleware
 const PageController = require('./Controllers/PageController');
+const ImageController = require('./Controllers/ImageController');
+const PageImageController = require('./Controllers/PageImageController');
+
 const pageController = new PageController();
+const imageController = new ImageController();
+const pageImageController = new PageImageController();
+
 app.use(pageController.mount, pageController.router);
+app.use(imageController.mount, imageController.router);
+app.use(pageImageController.mount, pageImageController.router);
 
 app.listen(port, () => {
   console.log(`Server is running on ${serverOrigin}:${port}`);

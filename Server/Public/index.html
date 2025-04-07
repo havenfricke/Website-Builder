@@ -2,160 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Page Manager</title>
-  <style>
-    /* Overall body styling */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
-    
-    /* Container to center content */
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-    
-    /* Header styling */
-    h1, h2 {
-      text-align: start;
-      color: #333;
-    }
-    
-    /* Form styling */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    
-    form label {
-      font-weight: bold;
-      color: #555;
-    }
-    
-    form input[type="text"],
-    form textarea {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    
-    form textarea {
-      resize: vertical;
-      height: 100px;
-    }
-    
-    form button {
-      padding: 10px;
-      border: none;
-      background: #007BFF;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    
-    form button:hover {
-      background: #0056b3;
-    }
-    
-    /* Results container styling */
-    #results {
-      margin-top: 20px;
-    }
-    
-    /* Page card styling */
-    .page-card {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 15px;
-      border-radius: 4px;
-      margin-bottom: 15px;
-      position: relative;
-    }
-    
-    .page-card h2 {
-      margin: 0;
-      font-size: 1.25em;
-      color: #333;
-    }
-    
-    .page-card small {
-      display: block;
-      margin-bottom: 10px;
-      color: #999;
-    }
-    
-    .page-card pre {
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 4px;
-      overflow: auto;
-      white-space: pre-wrap;
-    }
-    
-    /* Buttons for edit and delete */
-    .edit-button,
-    .delete-button {
-      padding: 5px 10px;
-      margin-right: 5px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-    
-    .edit-button {
-      background-color: #28a745;
-      color: #fff;
-    }
-    
-    .delete-button {
-      background-color: #dc3545;
-      color: #fff;
-    }
-    
-    /* Styling for the inline edit form */
-    .edit-form label {
-      margin-top: 10px;
-    }
-    
-    .edit-form button {
-      margin-top: 10px;
-    }
-    
-    /* Success/Error message styling */
-    .message {
-      text-align: center;
-      margin-bottom: 20px;
-      padding: 10px;
-      border-radius: 4px;
-    }
-    
-    .message.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-    
-    .message.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-  </style>
+  <title>Page & Image Manager</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
-    <h1>Page Manager</h1>
+    <h1>Page & Image Manager</h1>
     
     <!-- Create Page Section -->
     <section id="create-section">
@@ -189,188 +41,62 @@
       </form>
     </section>
     
-    <!-- Results Section -->
+    <!-- Results Section for Pages -->
     <div id="results"></div>
+    
+    <!-- Page-Image Association Section -->
+    <section id="pageImage-section">
+      <h2>Manage Page-Image Associations</h2>
+      <!-- Form to associate an image with a page -->
+      <form id="associateForm">
+        <label for="assocPageId">Page ID:</label>
+        <input type="text" id="assocPageId" name="pageId" required>
+        
+        <label for="assocImageId">Image ID:</label>
+        <input type="text" id="assocImageId" name="imageId" required>
+        
+        <button type="submit">Associate Image to Page</button>
+      </form>
+      <!-- Form to delete an image-page association -->
+      <form id="deleteAssociationForm">
+        <label for="deletePageId">Page ID:</label>
+        <input type="text" id="deletePageId" name="pageId" required>
+        
+        <label for="deleteImageId">Image ID:</label>
+        <input type="text" id="deleteImageId" name="imageId" required>
+        
+        <button type="submit">Delete Association</button>
+      </form>
+      <div id="pageImageMessage"></div>
+    </section>
+
+  <!-- Page Image Associations Display -->
+  <section id="pageImageResults-section">
+    <h2>Page Image Associations</h2>
+    <input type="text" id="searchPageId" placeholder="Enter page ID" />
+    <button id="loadPageImagesBtn">Load Associations</button>
+    <div id="pageImageResults"></div>
+  </section>
+    
+    <!-- Image Library Section -->
+    <section id="image-section">
+      <h2>Image Library</h2>
+      <form id="imageUploadForm" enctype="multipart/form-data">
+        <label for="imageTitle">Image Title:</label>
+        <input type="text" id="imageTitle" name="title" required>
+        
+        <label for="imageAltText">Alt Text:</label>
+        <input type="text" id="imageAltText" name="altText" required>
+        
+        <label for="imageInput">Upload Image:</label>
+        <input type="file" id="imageInput" name="content" accept="image/*" required>
+        <button type="submit">Upload Image</button>
+      </form>
+      <div id="imageMessage"></div>
+      <div id="imageLibrary"></div>
+    </section>
   </div>
-  <script>
-    // Function to display pages in the results section
-    function displayPages(pagesData) {
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = ''; // Clear previous results
-      
-      if (pagesData && pagesData.length > 0) {
-        pagesData.forEach(page => {
-          // Create a card for each page
-          const card = document.createElement('div');
-          card.className = 'page-card';
-          
-          const title = document.createElement('h2');
-          title.textContent = page.title;
-          
-          const idElem = document.createElement('small');
-          idElem.textContent = 'ID: ' + page.id;
-          
-          const contentPre = document.createElement('pre');
-          // Insert newline between HTML tags for readability
-          const formattedContent = page.content.replace(/></g, '>\n<');
-          contentPre.textContent = formattedContent;
-          
-          // Create Edit and Delete buttons
-          const editButton = document.createElement('button');
-          editButton.textContent = 'Edit';
-          editButton.className = 'edit-button';
-          
-          const deleteButton = document.createElement('button');
-          deleteButton.textContent = 'Delete';
-          deleteButton.className = 'delete-button';
-          
-          // Append elements to card
-          card.appendChild(title);
-          card.appendChild(idElem);
-          card.appendChild(contentPre);
-          card.appendChild(editButton);
-          card.appendChild(deleteButton);
-          
-          resultsDiv.appendChild(card);
-          
-          // Edit button event listener
-          editButton.addEventListener('click', () => {
-            // Create an inline edit form
-            const editForm = document.createElement('form');
-            editForm.className = 'edit-form';
-            
-            const titleLabel = document.createElement('label');
-            titleLabel.textContent = 'Title:';
-            const titleInput = document.createElement('input');
-            titleInput.type = 'text';
-            titleInput.value = page.title;
-            
-            const contentLabel = document.createElement('label');
-            contentLabel.textContent = 'Content:';
-            const contentTextarea = document.createElement('textarea');
-            contentTextarea.value = page.content;
-            
-            const saveButton = document.createElement('button');
-            saveButton.type = 'submit';
-            saveButton.textContent = 'Save';
-            
-            const cancelButton = document.createElement('button');
-            cancelButton.type = 'button';
-            cancelButton.textContent = 'Cancel';
-            
-            // Append form fields and buttons
-            editForm.appendChild(titleLabel);
-            editForm.appendChild(titleInput);
-            editForm.appendChild(contentLabel);
-            editForm.appendChild(contentTextarea);
-            editForm.appendChild(saveButton);
-            editForm.appendChild(cancelButton);
-            
-            // Replace the card content with the edit form
-            card.innerHTML = '';
-            card.appendChild(editForm);
-            
-            // Cancel button restores the original card display
-            cancelButton.addEventListener('click', () => {
-              displayPages([page]);
-            });
-            
-            // Handle the edit form submission
-            editForm.addEventListener('submit', function(e) {
-              e.preventDefault();
-              const updatedTitle = titleInput.value;
-              const updatedContent = contentTextarea.value;
-              
-              fetch(`http://localhost/pages/${page.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: updatedTitle, content: updatedContent })
-              })
-              .then(response => response.json())
-              .then(data => {
-                if(data.data) {
-                  displayPages([data.data]);
-                } else {
-                  alert('Error updating page.');
-                }
-              })
-              .catch(error => {
-                console.error('Error updating page:', error);
-              });
-            });
-          });
-          
-          // Delete button event listener
-          deleteButton.addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete this page?')) {
-              fetch(`http://localhost/pages/${page.id}`, {
-                method: 'DELETE'
-              })
-              .then(response => response.json())
-              .then(data => {
-                // Remove the card from the display
-                card.remove();
-              })
-              .catch(error => {
-                console.error('Error deleting page:', error);
-              });
-            }
-          });
-        });
-      } else {
-        resultsDiv.innerHTML = '<p>No pages found.</p>';
-      }
-    }
-    
-    // Handle the Search Form submission
-    document.getElementById('filterForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const params = new URLSearchParams(new FormData(e.target)).toString();
-      fetch('/pages?' + params)
-        .then(response => response.json())
-        .then(data => {
-          if(data.data) {
-            displayPages(data.data);
-          } else {
-            document.getElementById('results').innerHTML = '<p>No pages found.</p>';
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching pages:', error);
-          document.getElementById('results').innerHTML = '<p>Error fetching pages.</p>';
-        });
-    });
-    
-    // Handle the Create Page Form submission
-    document.getElementById('createForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const title = document.getElementById('createTitle').value;
-      const content = document.getElementById('createContent').value;
-      
-      fetch('http://localhost/pages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content })
-      })
-      .then(response => response.json())
-      .then(data => {
-        const messageDiv = document.getElementById('createMessage');
-        if(data.data) {
-          messageDiv.innerHTML = '<div class="message success">Page created successfully!</div>';
-          // Clear form inputs
-          document.getElementById('createForm').reset();
-          // Optionally, append the newly created page to the search results:
-          displayPages([data.data]);
-        } else {
-          messageDiv.innerHTML = '<div class="message error">Error creating page.</div>';
-        }
-      })
-      .catch(error => {
-        console.error('Error creating page:', error);
-        const messageDiv = document.getElementById('createMessage');
-        messageDiv.innerHTML = '<div class="message error">Error creating page.</div>';
-      });
-    });
-  </script>
+  
+  <script src="script.js"></script>
 </body>
 </html>

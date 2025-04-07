@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { observer } from "mobx-react-lite";
 import { AppState } from "../AppState";
 import { pageService } from "../Services/PageService";
+import { pageImageService } from '../Services/PageImageService';
 
 // Optional slugify function to convert page titles to URL-friendly slugs
 const slugify = (text) => {
@@ -22,18 +23,19 @@ function DynamicPage() {
 
   // Fetch pages if they haven't been loaded yet
   useEffect(() => {
-    if (AppState.pageArray.length === 0) {
+    if (AppState.pages.length === 0) {
       pageService.getAllPages();
     }
   }, []);
 
   // Once pages are loaded, search for the page matching the slug
   useEffect(() => {
-    if (AppState.pageArray.length > 0) {
-      const matchedPage = AppState.pageArray.find(p => slugify(p.title) === slug);
+    if (AppState.pages.length > 0) {
+      const matchedPage = AppState.pages.find(p => slugify(p.title) === slug);
       setPage(matchedPage);
+      pageImageService.getAllPageImages(matchedPage.id);
     }
-  }, [AppState.pageArray, slug]);
+  }, [AppState.pages, slug]);
 
   if (!page) {
     return null;

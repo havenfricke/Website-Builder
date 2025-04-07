@@ -1,13 +1,13 @@
 const multer = require('multer')
 const path = require('path')
-const pageService = require('../Services/PageService')
+const imageService = require('../Services/ImageService')
 const BaseController = require('../Utils/BaseController')
 
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'Uploads/')
+    callback(null)
   },
   filename: (req, file, callback) => {
     const { name, ext } = path.parse(file.originalname)
@@ -18,62 +18,63 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, callback) => {
-    const allowedFileMimeTypes = ['image/png', 'image/jpg', 'image/jpeg']
+    const allowedFileMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp']
     callback(null, allowedFileMimeTypes.includes(file.mimetype))
   }
 })
 
-class PageController extends BaseController {
+class ImageController extends BaseController {
   constructor() {
-    super('pages')
+    super('images')
     // Register the routes
     this.router
-      .get('', upload.none(), this.getAllPages)
-      .get('/:id', upload.none(), this.getPageById)
-      .post('', upload.none(), this.createPage)
-      .put('/:id', upload.none(), this.editPage)
-      .delete('/:id', upload.none(), this.deletePage)
+      .get('', upload.none(), this.getAllImages)
+      .get('/:id', upload.none(), this.getImageById)
+      .post('', upload.single('content'), this.createImage)
+      .put('/:id', upload.single('content'), this.editImage)
+      .delete('/:id', upload.none(), this.deleteImage)
   }
 
-  async getAllPages(req, res, next) {
+  async getAllImages(req, res, next) {
     try {
-      const pages = await pageService.getAllPages(req.query)
-      res.json({ data: pages })
+      const images = await imageService.getAllImages(req.query)
+      res.json({ data: images })
     } catch (error) {
       next(error)
     }
   }
 
-  async getPageById(req, res, next) {
+  async getImageById(req, res, next) {
     try {
-      const page = await pageService.getPageById(req.params.id)
-      res.json({ data: page })
+      const image = await imageService.getImageById(req.params.id)
+      res.json({ data: image })
     } catch (error) {
       next(error)
     }
   }
 
-  async createPage(req, res, next) {
+  async createImage(req, res, next) {
     try {
-      const newPage = await pageService.createPage(req.body);
-      res.status(201).json({ data: newPage });
+      const imageData = req.body; 
+      const image = await imageService.createImage(imageData);
+      res.json({ data: image });
     } catch (error) {
       next(error);
     }
   }
 
-  async editPage(req, res, next){
+  async editImage(req, res, next){
     try {
-      const page = await pageService.editPage(req.body, req.params.id);
-      res.json({ data: page })
+      const image = await imageService.editImage(req.body, req.params.id);
+      res.json({ data: image })
     } catch (error){
       next(error)
     }
   }
 
-  async deletePage(req, res, next) {
+  async deleteImage(req, res, next) {
     try {
-      const result = await pageService.deletePage(req.params.id);
+      const result = await imageService.deleteImage(req.params.id);
       res.json({ data: result });
     } catch (error) {
       next(error)
@@ -81,7 +82,7 @@ class PageController extends BaseController {
   }
 }
 
-module.exports = PageController
+module.exports = ImageController
 
 // In Express, the incoming request data is 
 // separated into different objects based on 
