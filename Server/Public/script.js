@@ -408,33 +408,57 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
           const resultsDiv = document.getElementById('pageImageResults');
+          resultsDiv.innerHTML = '';
+    
           if (data.data && data.data.length > 0) {
-            // Render each association; IDs are rendered in <small> tags with a data-copy attribute
-            resultsDiv.innerHTML = data.data
-              .map(assoc => `
-                <div class="page-image-association">
-                  <h3>${assoc.imageTitle}</h3>
-                  <p>
-                    <small class="copyable" data-copy="${assoc.pageId}" style="cursor:pointer;">
-                      Page ID: ${assoc.pageId}
-                    </small>
-                  </p>
-                  <p>
-                    <small class="copyable" data-copy="${assoc.imageId}" style="cursor:pointer;">
-                      Image ID: ${assoc.imageId}
-                    </small>
-                  </p>
-                  <p>HTML Title: ${assoc.htmlTitle}</p>
-                  <img src="${assoc.imageContent}" alt="${assoc.altText}" style="max-width:200px;">
-                </div>
-              `)
-              .join('');
-  
-            // Attach copy listeners to each newly rendered copyable element
-            const copyableEls = resultsDiv.querySelectorAll('.copyable');
-            copyableEls.forEach(el => {
-              const textToCopy = el.getAttribute('data-copy');
-              attachCopyListener(el, textToCopy);
+            data.data.forEach(assoc => {
+              const container = document.createElement('div');
+              container.className = 'page-image-association';
+    
+              const title = document.createElement('h3');
+              title.textContent = assoc.imageTitle;
+    
+              const pageIdElem = document.createElement('small');
+              pageIdElem.textContent = `Page ID: ${assoc.pageId}`;
+              attachCopyListener(pageIdElem, assoc.pageId);
+    
+              const imageIdElem = document.createElement('small');
+              imageIdElem.textContent = `Image ID: ${assoc.imageId}`;
+              attachCopyListener(imageIdElem, assoc.imageId);
+    
+              const htmlTitle = document.createElement('p');
+              htmlTitle.textContent = `HTML Title: ${assoc.htmlTitle}`;
+    
+              const img = document.createElement('img');
+              img.src = assoc.imageContent;
+              img.alt = assoc.altText;
+              img.style.maxWidth = '200px';
+    
+              const deleteBtn = document.createElement('button');
+              deleteBtn.textContent = 'Delete Association';
+              deleteBtn.className = 'delete-button';
+              deleteBtn.addEventListener('click', () => {
+                if (confirm('Delete this association?')) {
+                  fetch(`http://localhost/page-images/${assoc.pageId}/${assoc.imageId}`, {
+                    method: 'DELETE'
+                  })
+                  .then(res => res.json())
+                  .then(() => {
+                    container.remove(); // Remove the deleted entry from the DOM
+                  })
+                  .catch(err => {
+                    console.error('Error deleting association:', err);
+                  });
+                }
+              });
+    
+              container.appendChild(title);
+              container.appendChild(pageIdElem);
+              container.appendChild(imageIdElem);
+              container.appendChild(htmlTitle);
+              container.appendChild(img);
+              container.appendChild(deleteBtn);
+              resultsDiv.appendChild(container);
             });
           } else {
             resultsDiv.innerHTML = '<p>No image associations found for this page.</p>';

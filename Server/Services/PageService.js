@@ -15,11 +15,16 @@ async function getPageById(id) {
   return new Page(page.id, page.title, page.content);
 }
 
+// async function createPage(body) {
+//   const id = IdGen.getId();
+//   const created = await pageRepository.createPage(id, body);
+//   return new Page(created.id, created.title, created.content);
+// }
+
 async function createPage(body) {
-  const id = IdGen.getId();
-  const created = await pageRepository.createPage(id, body);
-  return new Page(created.id, created.title, created.content);
-}
+    const created = await pageRepository.createPage(body);
+    return new Page(created.id, created.title, created.content);
+  }
 
 async function editPage(update, id) {
   const original = await pageRepository.getPageById(id);

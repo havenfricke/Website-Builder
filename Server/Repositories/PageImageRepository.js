@@ -13,7 +13,8 @@ async function getAllPageImages(pageId) {
     FROM page_images pi
     INNER JOIN pages p ON pi.page_id = p.id
     INNER JOIN images i ON pi.image_id = i.id
-    WHERE pi.page_id = ?;
+    WHERE pi.page_id = ?
+    LIMIT 100;
   `;
   return await db.query(sql, [pageId]);
 }
@@ -34,10 +35,17 @@ async function createPageImage(pageId, imageId) {
     FROM page_images pi
     INNER JOIN pages p ON pi.page_id = p.id
     INNER JOIN images i ON pi.image_id = i.id
-    WHERE pi.page_id = ? AND pi.image_id = ?;
+    WHERE pi.page_id = ? AND pi.image_id = ?
+    LIMIT 100;
   `;
   const result = await db.query(selectSql, [pageId, imageId]);
   return result[0]; // assuming result is an array with one element
+}
+
+async function getPageImageById(pageId, imageId) {
+  const sql = `SELECT * FROM page_images WHERE page_id = ? AND image_id = ?`;
+  const [rows] = await db.query(sql, [pageId, imageId]);
+  return rows[0] || null;
 }
 
 async function deletePageImage(pageId, imageId) {
@@ -47,6 +55,7 @@ async function deletePageImage(pageId, imageId) {
 }
 
 module.exports = {
+  getPageImageById,
   getAllPageImages,
   createPageImage,
   deletePageImage,

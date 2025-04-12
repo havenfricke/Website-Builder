@@ -2,7 +2,7 @@ const multer = require('multer')
 const path = require('path')
 const imageService = require('../Services/ImageService')
 const BaseController = require('../Utils/BaseController')
-
+const { checkSchema, validationResult } = require('express-validator');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -23,16 +23,29 @@ const upload = multer({
   }
 })
 
+const validateImageUpload = checkSchema({
+  title: {
+    notEmpty: { errorMessage: 'Title is required.' },
+    isLength: { options: { max: 100 }, errorMessage: 'Max 100 characters allowed.' }
+  },
+  altText: {
+    notEmpty: { errorMessage: 'Alt text is required.' },
+    isLength: { options: { max: 150 }, errorMessage: 'Max 150 characters allowed.' }
+  },
+  content: {
+    notEmpty: { errorMessage: "Image is required."}
+  }
+})
+
 class ImageController extends BaseController {
   constructor() {
-    super('images')
-    // Register the routes
+    super('images');
     this.router
       .get('', upload.none(), this.getAllImages)
       .get('/:id', upload.none(), this.getImageById)
-      .post('', upload.single('content'), this.createImage)
-      .put('/:id', upload.single('content'), this.editImage)
-      .delete('/:id', upload.none(), this.deleteImage)
+      .post('', upload.single('content'), validateImageUpload, this.createImage)
+      .put('/:id', upload.none(), this.editImage)
+      .delete('/:id', upload.none(), this.deleteImage);
   }
 
   async getAllImages(req, res, next) {
@@ -53,10 +66,14 @@ class ImageController extends BaseController {
     }
   }
 
+    
+
   async createImage(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
     try {
-      const imageData = req.body; 
-      const image = await imageService.createImage(imageData);
+      const image = await imageService.createImage(req.body);
       res.json({ data: image });
     } catch (error) {
       next(error);
@@ -64,6 +81,9 @@ class ImageController extends BaseController {
   }
 
   async editImage(req, res, next){
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
     try {
       const image = await imageService.editImage(req.body, req.params.id);
       res.json({ data: image })

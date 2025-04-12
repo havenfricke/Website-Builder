@@ -1,5 +1,17 @@
 const BaseController = require('../Utils/BaseController');
 const pageImageService = require('../Services/PageImageService');
+const { checkSchema, validationResult } = require('express-validator');
+
+const validateAssociation = checkSchema({
+  pageId: {
+    notEmpty: { errorMessage: 'pageId is required.' },
+    isString: { errorMessage: 'pageId must be a string.' }
+  },
+  imageId: {
+    notEmpty: { errorMessage: 'imageId is required.' },
+    isString: { errorMessage: 'imageId must be a string.' }
+  }
+});
 
 class PageImageController extends BaseController {
   constructor() {
@@ -7,7 +19,7 @@ class PageImageController extends BaseController {
     // Register routes for the page images endpoints.
     this.router
       .get('/:pageId', this.getAllPageImages)
-      .post('', this.createPageImage)
+      .post('', validateAssociation, this.createPageImage)
       .delete('/:pageId/:imageId', this.deletePageImage);
   }
 
@@ -23,16 +35,19 @@ class PageImageController extends BaseController {
   }
 
   async createPageImage(req, res, next) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
     try {
       const { pageId, imageId } = req.body;
-      console.log("Creating association with:", pageId, imageId);
-      const created = await pageImageService.createPageImage(pageId, imageId);
-      res.json({ data: created });
+      const created = await pageImageService.createPageImage(pageId.trim(), imageId.trim());
+      res.status(201).json({ data: created });
     } catch (error) {
-      console.error("Error in createPageImage:", error);
       next(error);
     }
   }
+
 
   // DELETE /page-images/:pageId/:imageId
   async deletePageImage(req, res, next) {

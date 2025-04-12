@@ -19,9 +19,14 @@ async function getImageById(id) {
   return new Image(image.id, image.title, image.alt_text, image.content);
 }
 
+// async function createImage(body) {
+//     const id = IdGen.getId();
+//     const created = await imageRepository.createImage(id, body);
+//     return new Image(created.id, created.title, created.alt_text, created.content);
+//   }
+
 async function createImage(body) {
-    const id = IdGen.getId();
-    const created = await imageRepository.createImage(id, body);
+    const created = await imageRepository.createImage(body);
     return new Image(created.id, created.title, created.alt_text, created.content);
   }
 

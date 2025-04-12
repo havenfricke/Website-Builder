@@ -2,6 +2,7 @@ const multer = require('multer')
 const path = require('path')
 const pageService = require('../Services/PageService')
 const BaseController = require('../Utils/BaseController')
+const { checkSchema, validationResult } = require('express-validator')
 
 
 // Configure multer for file uploads
@@ -23,16 +24,26 @@ const upload = multer({
   }
 })
 
+const validatePage = checkSchema({
+  title: {
+    notEmpty: { errorMessage: 'Title is required.' },
+    isLength: { options: { max: 100 }, errorMessage: 'Max 100 characters.' }
+  },
+  content: {
+    notEmpty: { errorMessage: 'Content is required.' },
+    isLength: { options: { min: 3 }, errorMessage: 'Content must be at least 3 characters.' }
+  }
+});
+
 class PageController extends BaseController {
   constructor() {
-    super('pages')
-    // Register the routes
+    super('pages');
     this.router
       .get('', upload.none(), this.getAllPages)
       .get('/:id', upload.none(), this.getPageById)
-      .post('', upload.none(), this.createPage)
-      .put('/:id', upload.none(), this.editPage)
-      .delete('/:id', upload.none(), this.deletePage)
+      .post('', upload.none(), validatePage, this.createPage)
+      .put('/:id', upload.none(), validatePage, this.editPage)
+      .delete('/:id', upload.none(), this.deletePage);
   }
 
   async getAllPages(req, res, next) {
@@ -54,6 +65,9 @@ class PageController extends BaseController {
   }
 
   async createPage(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
     try {
       const newPage = await pageService.createPage(req.body);
       res.status(201).json({ data: newPage });
@@ -62,12 +76,15 @@ class PageController extends BaseController {
     }
   }
 
-  async editPage(req, res, next){
+  async editPage(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
     try {
-      const page = await pageService.editPage(req.body, req.params.id);
-      res.json({ data: page })
-    } catch (error){
-      next(error)
+      const newPage = await pageService.createPage(req.body);
+      res.status(201).json({ data: newPage });
+    } catch (error) {
+      next(error);
     }
   }
 
