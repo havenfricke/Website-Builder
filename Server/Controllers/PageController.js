@@ -81,7 +81,7 @@ class PageController extends BaseController {
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
-      const newPage = await pageService.createPage(req.body);
+      const newPage = await pageService.editPage(req.params.id, req.body);
       res.status(201).json({ data: newPage });
     } catch (error) {
       next(error);

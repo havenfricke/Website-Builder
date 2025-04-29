@@ -26,7 +26,7 @@ async function createPage(body) {
     return new Page(created.id, created.title, created.content);
   }
 
-async function editPage(update, id) {
+async function editPage(id, update) {
   const original = await pageRepository.getPageById(id);
   if (!original) {
     throw new Error("Page not found");
